@@ -32,6 +32,16 @@ python main.py --selftest     # headless logic smoke test
 pyinstaller --onefile --windowed --name FoodFight main.py   # build dist/FoodFight.exe
 ```
 
+## Xbox / MonoGame port
+
+`port/` contains a C# MonoGame port with identical gameplay, targeting
+real Xbox One consoles via UWP/Xbox Dev Mode (plus a desktop head for
+development, with twin-stick gamepad support). Build the desktop head
+with `dotnet build port/FoodFight.Desktop`; run its headless logic test
+with `dotnet run --project port/FoodFight.Desktop -- --selftest`. See
+[port/README-XBOX.md](port/README-XBOX.md) for the console build,
+deploy, and Creators Program publishing guide.
+
 ## Releasing
 
 CI (GitHub Actions, `.github/workflows/build.yml`) tests and builds the
