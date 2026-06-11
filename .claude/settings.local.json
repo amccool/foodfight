@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(pip *)",
+      "PowerShell(Get-Item D:\\\\temp\\\\code\\\\foodfight\\\\dist\\\\FoodFight.exe | Select-Object Name, Length; $p = Start-Process D:\\\\temp\\\\code\\\\foodfight\\\\dist\\\\FoodFight.exe -PassThru; Start-Sleep -Seconds 6; if \\($p.HasExited\\) { \"EXE EXITED EARLY code=$\\($p.ExitCode\\)\" } else { \"EXE RUNNING OK\"; Stop-Process -Id $p.Id -Force })"
+    ]
+  }
+}
