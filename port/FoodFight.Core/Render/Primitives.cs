@@ -25,7 +25,7 @@ namespace FoodFight
                 float dx = x - 63.5f, dy = y - 63.5f;
                 float d = (float)Math.Sqrt(dx * dx + dy * dy);
                 float a = C.Clamp(63.5f - d + 0.5f, 0f, 1f);
-                return new Color(1f, 1f, 1f, a);
+                return new Color(a, a, a, a);   // premultiplied for AlphaBlend
             });
 
             Triangle = MakeTexture(gd, 64, 64, (x, y) =>
