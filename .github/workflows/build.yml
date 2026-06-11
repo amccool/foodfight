@@ -1,0 +1,71 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history + tags, needed for release notes
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pygame pyinstaller
+
+      - name: Selftest (headless)
+        run: python main.py --selftest
+
+      - name: Build FoodFight.exe
+        run: pyinstaller --onefile --windowed --name FoodFight main.py
+
+      - name: Smoke-test the exe
+        shell: pwsh
+        run: |
+          $p = Start-Process dist/FoodFight.exe -PassThru
+          Start-Sleep -Seconds 8
+          if ($p.HasExited) { throw "FoodFight.exe exited early (code $($p.ExitCode))" }
+          Stop-Process -Id $p.Id -Force
+          "exe launched and stayed running"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FoodFight-win64
+          path: dist/FoodFight.exe
+
+      - name: Write release notes from commit history
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          prev=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
+          if [ -n "$prev" ]; then range="${prev}..${tag}"; else range="${tag}"; fi
+          {
+            echo "## FoodFight ${tag}"
+            echo
+            echo "Windows build attached below (\`FoodFight.exe\`, no install required)."
+            echo
+            echo "### Changes"
+            git log "$range" --no-merges --pretty='- %s (%h)'
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/FoodFight.exe
+          body_path: release-notes.md
+          generate_release_notes: true
