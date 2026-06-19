@@ -30,3 +30,16 @@ jobs:
         with:
           name: FoodFight-MonoGame-win64
           path: publish
+
+  uwp:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore port/FoodFight.Uwp/FoodFight.Uwp.csproj
+
+      - name: Build UWP head (Debug x64)
+        run: msbuild port/FoodFight.Uwp/FoodFight.Uwp.csproj /p:Configuration=Debug /p:Platform=x64 /m
